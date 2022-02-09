@@ -10,6 +10,6 @@ describe("Prescription",() => {
         }
 
         const response = await CreatePrescription(data)
-        expect(response).toHaveProperty("id")
+        expect(response).toHaveProperty("text")
     })
 })
