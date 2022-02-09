@@ -1,13 +1,12 @@
-require('dotenv').config({
-  path: process.env.NODE_ENV === 'test' ? ".env.test" : ".env"
-})
+const envType = process.env.NODE_ENV_TYPE = "test" ? "test" : ""
+require('custom-env').env(envType)
+
 const user = process.env.DB_USER
 const password = process.env.DB_PASSWORD
 const host = process.env.DB_HOST
 const database = process.env.DB_DATABASE
 
 module.exports = {
-  development: {
     client: 'pg',
     connection: {
       host,
@@ -20,5 +19,4 @@ module.exports = {
       tableName: "knexMigrations",
       directory: `${__dirname}/src/database/migrations`
     }
-  }
 };

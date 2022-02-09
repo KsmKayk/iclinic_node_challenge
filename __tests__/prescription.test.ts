@@ -1,3 +1,4 @@
+import knex from "../src/database/index"
 import CreatePrescription from "../src/services/CreatePrescription"
 
 describe("Prescription",() => {
@@ -10,6 +11,11 @@ describe("Prescription",() => {
         }
 
         const response = await CreatePrescription(data)
+        expect(response).toHaveProperty("id")
         expect(response).toHaveProperty("text")
+    })
+    afterAll(done => {
+        knex.destroy();
+        done()
     })
 })
