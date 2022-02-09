@@ -1,6 +1,5 @@
-require('dotenv').config({
-    path: process.env.NODE_ENV === 'test' ? ".env.test" : ".env"
-})
+const envType = process.env.NODE_ENV_TYPE = "test" ? "test" : ""
+require('custom-env').env(envType)
 import express from  'express'
 import routes from "./routes"
 
