@@ -1,3 +1,4 @@
+import knexCleaner from "knex-cleaner"
 import knex from "../src/database/index"
 import CreatePrescription from "../src/services/CreatePrescription"
 
@@ -15,7 +16,9 @@ describe("Prescription",() => {
         expect(response).toHaveProperty("text")
     })
     afterAll(done => {
-        knex.destroy();
+        knexCleaner.clean(knex).then(function() {
+            knex.destroy();
+        });
         done()
     })
 })
