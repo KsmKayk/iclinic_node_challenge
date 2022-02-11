@@ -15,8 +15,29 @@ describe("Prescription",() => {
         expect(response).toHaveProperty("id")
         expect(response).toHaveProperty("text")
     })
+    it("should not be able to create a new prescription with invalid data", async () => {
+        const data = {
+            clinic_id: 1,
+            physician_id: 1,
+            patient_id:1,
+            text: ""
+        }
+
+        try {
+            expect(await CreatePrescription(data)).toThrowError()
+
+        } catch (error: Error | any) {
+            expect(error.message).toBe("text is undefined, null or empty")
+        }
+
+
+    })
     afterAll(done => {
-        knexCleaner.clean(knex).then(function() {
+        let options = {
+            ignoreTables: ['knexMigrations', 'knexMigrations_lock']
+        }
+
+        knexCleaner.clean(knex, options).then(function() {
             knex.destroy();
         });
         done()

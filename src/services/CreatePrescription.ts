@@ -16,6 +16,43 @@ export default async function CreatePrescription(
     {clinic_id, physician_id, text, patient_id}:PrescriptionData
 ): Promise<PrescriptionData | void> {
 
+    const verify = verifyData({clinic_id, physician_id, text, patient_id})
+    if(verify !== true) {
+        throw new Error(verify)
+    }
+    const response = await AddPrescriptionToDatabase({clinic_id, physician_id, text, patient_id})
+
+    return response
+}
+
+function verifyData(
+    {clinic_id, physician_id, text, patient_id}:PrescriptionData
+): true | string {
+
+    if (clinic_id === undefined || clinic_id === null) {
+        const errorString = "clinic_id is undefined or null"
+        return errorString
+    }
+    if (physician_id === undefined || physician_id === null) {
+        const errorString = "physician_id is undefined or null"
+        return errorString
+    }
+    if (patient_id === undefined || patient_id === null) {
+        const errorString = "patient_id is undefined or null"
+        return errorString
+    }
+    if (text === undefined || text === null || text === "") {
+        const errorString = "text is undefined, null or empty"
+        return errorString
+    }
+
+    return true
+
+}
+
+async function AddPrescriptionToDatabase(
+    {clinic_id, physician_id, text, patient_id}:PrescriptionData
+): Promise<PrescriptionData | void> {
     const response = await knex("prescriptions").insert({
         clinic_id,
         physician_id,
@@ -42,6 +79,4 @@ export default async function CreatePrescription(
     })
 
     return response
-
-
 }
