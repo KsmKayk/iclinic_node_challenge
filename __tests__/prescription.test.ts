@@ -27,7 +27,7 @@ describe("Prescription",() => {
             expect(await CreatePrescription(data)).toThrowError()
 
         } catch (error: Error | any) {
-            expect(error.message).toBe("text is undefined, null or empty")
+            expect(error.description).toBe("text is undefined, null or empty")
         }
 
 

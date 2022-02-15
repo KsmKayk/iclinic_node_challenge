@@ -1,4 +1,7 @@
 import knex from "../database/index"
+import ApiError from "../utils/ApiError"
+import * as rax from 'retry-axios';
+import axios from 'axios';
 
 interface PrescriptionData{
     id?: number,
@@ -8,8 +11,31 @@ interface PrescriptionData{
     text: string
 }
 
+interface PhysicianData {
+    id:string,
+    crm: string,
+    name:string
+}
+interface ClinicData {
+    id:string,
+    name:string
+}
+interface PhysicianData {
+    id:string,
+    email: string,
+    phone: string,
+    name:string
+}
+
 interface IdResponse {
     id:number
+}
+
+interface ErrorObject {
+    message: string,
+    code: number,
+    httpCode: number,
+    description:string
 }
 
 export default async function CreatePrescription(
@@ -18,7 +44,7 @@ export default async function CreatePrescription(
 
     const verify = verifyData({clinic_id, physician_id, text, patient_id})
     if(verify !== true) {
-        throw new Error(verify)
+        throw new ApiError(verify)
     }
     const response = await AddPrescriptionToDatabase({clinic_id, physician_id, text, patient_id})
 
@@ -27,28 +53,55 @@ export default async function CreatePrescription(
 
 function verifyData(
     {clinic_id, physician_id, text, patient_id}:PrescriptionData
-): true | string {
+): true | ErrorObject {
 
     if (clinic_id === undefined || clinic_id === null) {
-        const errorString = "clinic_id is undefined or null"
-        return errorString
+        const Error:ErrorObject = {
+            message: "malformed request",
+            code: 1,
+            httpCode: 400,
+            description: "clinic_id is undefined or null"
+        }
+
+        return Error
+
     }
     if (physician_id === undefined || physician_id === null) {
-        const errorString = "physician_id is undefined or null"
-        return errorString
+        const Error:ErrorObject = {
+            message: "malformed request",
+            code: 1,
+            httpCode: 400,
+            description: "physician_id is undefined or null"
+        }
+
+        return Error
     }
     if (patient_id === undefined || patient_id === null) {
-        const errorString = "patient_id is undefined or null"
-        return errorString
+        const Error:ErrorObject = {
+            message: "malformed request",
+            code: 1,
+            httpCode: 400,
+            description: "patient_id is undefined or null"
+        }
+
+        return Error
     }
     if (text === undefined || text === null || text === "") {
-        const errorString = "text is undefined, null or empty"
-        return errorString
+        const Error:ErrorObject = {
+            message: "malformed request",
+            code: 1,
+            httpCode: 400,
+            description: "text is undefined, null or empty"
+        }
+
+        return Error
     }
 
     return true
 
 }
+
+async function FetchPhysician():Promise<PhysicianData | void> {}
 
 async function AddPrescriptionToDatabase(
     {clinic_id, physician_id, text, patient_id}:PrescriptionData
