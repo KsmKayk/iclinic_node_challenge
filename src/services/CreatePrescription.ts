@@ -53,9 +53,30 @@ export default async function CreatePrescription(
 
     verifyData({clinic_id, physician_id, text, patient_id})
     const prescriptionData = await AddPrescriptionToDatabase({clinic_id, physician_id, text, patient_id})
-    const physicianData = await FetchPhysician(physician_id)
-    const clinicData = await  FetchClinic(clinic_id)
-    const patientData = await FetchPatient(patient_id)
+    let clinicData: boolean | ClinicData = false
+
+    try {
+        clinicData = await FetchClinic(clinic_id)
+    } catch (e) {
+        clinicData = false
+    }
+
+    try {
+        const physicianData = await FetchPhysician(physician_id)
+        const patientData = await FetchPatient(patient_id)
+    } catch (e: Error | any) {
+        const error = {
+            message: e.message,
+            code: e.code,
+            httpCode: e.httpCode,
+            description: e.description
+
+        }
+
+        await knex("prescriptions").where("id", prescriptionData.id).del()
+        throw new ApiError(error)
+    }
+
 
 
     return prescriptionData
@@ -212,7 +233,7 @@ async function FetchPhysician(physician_id:number):Promise<PhysicianData | void>
 
 }
 
-async function FetchClinic(clinic_id:number):Promise<ClinicData | void> {
+async function FetchClinic(clinic_id:number):Promise<ClinicData> {
     const url = process.env.DEPENDENTS_URL
     const retry = process.env.CLINICS_RETRY
     const timeout = process.env.CLINICS_TIMEOUT
@@ -244,6 +265,29 @@ async function FetchClinic(clinic_id:number):Promise<ClinicData | void> {
     }).then((response) => {
         return response.data
 
+    }).catch((e) => {
+        console.log(e.response.status)
+        if (e.response.status == 404) {
+            const error: ErrorObject = {
+                message: "clinic not found",
+                httpCode: 404,
+                code: 2,
+                description: "clinic not found"
+            }
+
+            throw new ApiError(error)
+        }
+
+        if (e.response.status == 503) {
+            const error: ErrorObject = {
+                message: "clinic service not available",
+                httpCode: 503,
+                code: 5,
+                description: "clinic service not available"
+            }
+
+            throw new ApiError(error)
+        }
     })
 
     return clinic
