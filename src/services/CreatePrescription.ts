@@ -11,6 +11,13 @@ interface PrescriptionData{
     text: string
 }
 
+interface PatientData {
+    id:string,
+    name:string,
+    phone:string,
+    email:string
+}
+
 interface PhysicianData {
     id:string,
     crm: string,
@@ -45,11 +52,13 @@ export default async function CreatePrescription(
 
 
     verifyData({clinic_id, physician_id, text, patient_id})
-    const prescriptioData = await AddPrescriptionToDatabase({clinic_id, physician_id, text, patient_id})
+    const prescriptionData = await AddPrescriptionToDatabase({clinic_id, physician_id, text, patient_id})
     const physicianData = await FetchPhysician(physician_id)
+    const clinicData = await  FetchClinic(clinic_id)
+    const patientData = await FetchPatient(patient_id)
 
 
-    return prescriptioData
+    return prescriptionData
 }
 
 function verifyData(
@@ -100,66 +109,6 @@ function verifyData(
 
 }
 
-async function FetchPhysician(physician_id:number):Promise<PhysicianData | void> {
-        const url = process.env.DEPENDENTS_URL
-        const retry = process.env.PHYSICIANS_RETRY
-        const timeout = process.env.PHYSICIANS_TIMEOUT
-        const token = process.env.PHYSICIANS_TOKEN
-
-        if(retry === undefined) {
-            throw new Error( "Can't find retry env config")
-        }
-        if(token === undefined) {
-            throw new Error( "Can't find token env config")
-        }
-        if(timeout === undefined) {
-            throw new Error( "Can't find timeout env config")
-        }
-        if(url === undefined) {
-            throw new Error( "Can't find url env config")
-        }
-
-        const physician = await axios({
-            url: `${url}/physicians/${physician_id.toString()}`,
-            method: "GET",
-            timeout: parseInt(timeout),
-            headers: {
-               Authorization: token
-            },
-            raxConfig: {
-                retry: parseInt(retry)
-            }
-        }).then((response) => {
-            return response.data
-        }).catch((e) => {
-            console.log(e.response.status)
-            if (e.response.status == 404) {
-                const error: ErrorObject = {
-                    message: "physician not found",
-                    httpCode: 503,
-                    code: 2,
-                    description: "physician not found"
-                }
-
-                throw new ApiError(error)
-            }
-
-            if (e.response.status == 503) {
-                const error: ErrorObject = {
-                    message: "physicians service not available",
-                    httpCode: 503,
-                    code: 5,
-                    description: "physicians service not available"
-                }
-
-                throw new ApiError(error)
-            }
-        })
-
-    return physician
-
-}
-
 async function AddPrescriptionToDatabase(
     {clinic_id, physician_id, text, patient_id}:PrescriptionData
 ): Promise<PrescriptionData> {
@@ -202,3 +151,163 @@ async function AddPrescriptionToDatabase(
     }
 
 }
+
+async function FetchPhysician(physician_id:number):Promise<PhysicianData | void> {
+        const url = process.env.DEPENDENTS_URL
+        const retry = process.env.PHYSICIANS_RETRY
+        const timeout = process.env.PHYSICIANS_TIMEOUT
+        const token = process.env.PHYSICIANS_TOKEN
+
+        if(retry === undefined) {
+            throw new Error( "Can't find retry env config")
+        }
+        if(token === undefined) {
+            throw new Error( "Can't find token env config")
+        }
+        if(timeout === undefined) {
+            throw new Error( "Can't find timeout env config")
+        }
+        if(url === undefined) {
+            throw new Error( "Can't find url env config")
+        }
+
+        const physician = await axios({
+            url: `${url}/physicians/${physician_id.toString()}`,
+            method: "GET",
+            timeout: parseInt(timeout),
+            headers: {
+               Authorization: token
+            },
+            raxConfig: {
+                retry: parseInt(retry)
+            }
+        }).then((response) => {
+            return response.data
+        }).catch((e) => {
+            console.log(e.response.status)
+            if (e.response.status == 404) {
+                const error: ErrorObject = {
+                    message: "physician not found",
+                    httpCode: 404,
+                    code: 2,
+                    description: "physician not found"
+                }
+
+                throw new ApiError(error)
+            }
+
+            if (e.response.status == 503) {
+                const error: ErrorObject = {
+                    message: "physicians service not available",
+                    httpCode: 503,
+                    code: 5,
+                    description: "physicians service not available"
+                }
+
+                throw new ApiError(error)
+            }
+        })
+
+    return physician
+
+}
+
+async function FetchClinic(clinic_id:number):Promise<ClinicData | void> {
+    const url = process.env.DEPENDENTS_URL
+    const retry = process.env.CLINICS_RETRY
+    const timeout = process.env.CLINICS_TIMEOUT
+    const token = process.env.CLINICS_TOKEN
+
+    if(retry === undefined) {
+        throw new Error( "Can't find retry env config")
+    }
+    if(token === undefined) {
+        throw new Error( "Can't find token env config")
+    }
+    if(timeout === undefined) {
+        throw new Error( "Can't find timeout env config")
+    }
+    if(url === undefined) {
+        throw new Error( "Can't find url env config")
+    }
+
+    const clinic = await axios({
+        url: `${url}/clinics/${clinic_id.toString()}`,
+        method: "GET",
+        timeout: parseInt(timeout),
+        headers: {
+            Authorization: token
+        },
+        raxConfig: {
+            retry: parseInt(retry)
+        }
+    }).then((response) => {
+        return response.data
+
+    })
+
+    return clinic
+
+}
+
+async function FetchPatient(patient_id:number):Promise<PatientData | void> {
+    const url = process.env.DEPENDENTS_URL
+    const retry = process.env.PATIENTS_RETRY
+    const timeout = process.env.PATIENTS_TIMEOUT
+    const token = process.env.PATIENTS_TOKEN
+
+    if(retry === undefined) {
+        throw new Error( "Can't find retry env config")
+    }
+    if(token === undefined) {
+        throw new Error( "Can't find token env config")
+    }
+    if(timeout === undefined) {
+        throw new Error( "Can't find timeout env config")
+    }
+    if(url === undefined) {
+        throw new Error( "Can't find url env config")
+    }
+
+    const patient = await axios({
+        url: `${url}/patients/${patient_id.toString()}`,
+        method: "GET",
+        timeout: parseInt(timeout),
+        headers: {
+            Authorization: token
+        },
+        raxConfig: {
+            retry: parseInt(retry)
+        }
+    }).then((response) => {
+        return response.data
+    }).catch((e) => {
+        console.log(e.response.status)
+        if (e.response.status == 404) {
+            const error: ErrorObject = {
+                message: "patient not found",
+                httpCode: 404,
+                code: 2,
+                description: "patient not found"
+            }
+
+            throw new ApiError(error)
+        }
+
+        if (e.response.status == 503) {
+            const error: ErrorObject = {
+                message: "patients service not available",
+                httpCode: 503,
+                code: 5,
+                description: "patients service not available"
+            }
+
+            throw new ApiError(error)
+        }
+    })
+
+    return patient
+
+}
+
+
