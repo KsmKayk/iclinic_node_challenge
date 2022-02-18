@@ -283,7 +283,6 @@ async function FetchPhysician(physician_id:number):Promise<PhysicianData> {
         }).then((response) => {
             return response.data
         }).catch((e) => {
-            console.log(e.response.status)
             if (e.response.status == 404) {
                 const error: ErrorObject = {
                     message: "physician not found",

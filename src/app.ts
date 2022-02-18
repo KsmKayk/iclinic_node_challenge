@@ -1,5 +1,4 @@
-const envType = process.env.NODE_ENV_TYPE = "test" ? "test" : ""
-require('custom-env').env(envType)
+require('custom-env').env(process.env.NODE_ENV);
 import express from  'express'
 import routes from "./routes"
 
