@@ -12,10 +12,10 @@ describe("Prescription",() => {
         }
 
         const response = await CreatePrescription(data)
-        expect(response).toHaveProperty("id")
-        expect(response).toHaveProperty("text")
+        expect(response.data).toHaveProperty("id")
+        expect(response).toHaveProperty("metric")
     })
-    it("should not be able to create a new prescription with invalid data", async () => {
+    it("should not be able to create a new prescription with empty text", async () => {
         const data = {
             clinic_id: 1,
             physician_id: 1,
@@ -28,6 +28,23 @@ describe("Prescription",() => {
 
         } catch (error: Error | any) {
             expect(error.description).toBe("text is undefined, null or empty")
+        }
+
+
+    })
+    it("should not be able to create a new prescription with non existing physician", async () => {
+        const data = {
+            clinic_id: 1,
+            physician_id: 9999,
+            patient_id:1,
+            text: "Dipirona 1x ao dia"
+        }
+
+        try {
+            expect(await CreatePrescription(data)).toThrowError()
+
+        } catch (error: Error | any) {
+            expect(error.httpCode).toBe(404)
         }
 
 
