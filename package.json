@@ -6,10 +6,10 @@
   "author": "Kayk <ksm.kayk@outlook.com>",
   "license": "MIT",
   "scripts": {
-    "start": "set NODE_ENV=development && node ./dist/server.js",
-    "dev": "set NODE_ENV=development && ts-node-dev src/server.ts --ignore __tests__",
-    "pretest": "set NODE_ENV=test && knex migrate:latest ",
-    "test": "set NODE_ENV=test && jest"
+    "start": "set NODE_ENV_TYPE=development && node ./dist/server.js",
+    "dev": "set NODE_ENV_TYPE=development && ts-node-dev src/server.ts --ignore __tests__",
+    "pretest": "set NODE_ENV_TYPE=test && knex migrate:latest ",
+    "test": "set NODE_ENV_TYPE=test && jest"
   },
   "dependencies": {
     "axios": "^0.25.0",

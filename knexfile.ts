@@ -1,5 +1,12 @@
-const envType = process.env.NODE_ENV_TYPE = "test" ? "test" : ""
-require('custom-env').env(envType)
+let env = process.env.NODE_ENV_TYPE == undefined ? "" : process.env.NODE_ENV_TYPE
+env = env.trim()
+if(env === "development") {
+    require("dotenv").config();
+}
+
+if(env === "test") {
+    require("custom-env").env("test")
+}
 
 const user = process.env.DB_USER
 const password = process.env.DB_PASSWORD
